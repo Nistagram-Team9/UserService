@@ -1,7 +1,7 @@
 name: Feature Branch
 
 on:
-  pull_request:
+  push:
       - 'main'
 
 jobs:
