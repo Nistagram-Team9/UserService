@@ -2,6 +2,7 @@ name: Feature Branch
 
 on:
   push:
+    branches:
       - 'main'
 
 jobs:
