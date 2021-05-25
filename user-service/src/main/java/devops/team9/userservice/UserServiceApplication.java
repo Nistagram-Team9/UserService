@@ -2,6 +2,7 @@ package devops.team9.userservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 
 @SpringBootApplication
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class })
@@ -11,6 +12,7 @@ public class UserServiceApplication {
 		SpringApplication.run(UserServiceApplication.class, args);
 		System.out.println("Hell00aaoa");
 		System.out.println("Hell00aaoa11");
+
 
 	}
 
