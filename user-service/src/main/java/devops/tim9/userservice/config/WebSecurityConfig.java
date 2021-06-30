@@ -48,7 +48,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	private PasswordEncoder passwordEncoder;
 	private UserService userService;
 	private VerificationTokenService verificationTokenService;
-	
+
 	@Autowired
 	UserEventProducer userEventProducer;
 
@@ -56,23 +56,23 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 
 		http
-			// communication between client and server is stateless
-			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-			.authorizeRequests()
-			.antMatchers("/auth/login").permitAll()
-			.antMatchers("/auth/registerAdmin").permitAll()
-			.antMatchers("/users/**").permitAll()
+				// communication between client and server is stateless
+				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+				.authorizeRequests()
+				.antMatchers("/auth/login").permitAll()
+				.antMatchers("/auth/registerAdmin").permitAll()
+				.antMatchers("/users/**").permitAll()
 
 				//antMatchers("/auth/registerLibrarian").permitAll()
-			//.antMatchers("/books/**").permitAll()
-			//.antMatchers("/bookCopies/**").permitAll()
-			//.antMatchers("/users/**").permitAll()
-			//.antMatchers("/bookRent/**").permitAll()
-			// every request needs to be authorized
-			.anyRequest().authenticated().and()
-			// add filter before every request
-			.addFilterBefore(new TokenAuthenticationFilter(tokenHelper, userService),
-				BasicAuthenticationFilter.class);
+				//.antMatchers("/books/**").permitAll()
+				//.antMatchers("/bookCopies/**").permitAll()
+				//.antMatchers("/users/**").permitAll()
+				//.antMatchers("/bookRent/**").permitAll()
+				// every request needs to be authorized
+				.anyRequest().authenticated().and()
+				// add filter before every request
+				.addFilterBefore(new TokenAuthenticationFilter(tokenHelper, userService),
+						BasicAuthenticationFilter.class);
 		http.csrf().disable();
 
 	}
@@ -81,9 +81,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		// Token Filter will ignore these paths
 		web.ignoring().antMatchers(HttpMethod.POST, "/auth/login", "/h2/**");
 		web.ignoring().antMatchers(HttpMethod.GET, "/", "/login", "/h2/**", "/webjars/**", "/*.html", "/favicon.ico",
-			"/**/*.html", "/**/*.css", "/**/*.js");
+				"/**/*.html", "/**/*.css", "/**/*.js");
 
-		
+
 	}
 
 
@@ -91,7 +91,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		final Authentication authentication;
 		try {
 			authentication = authenticationManagerBean().authenticate(new UsernamePasswordAuthenticationToken(
-				authenticationRequest.getUsername(), authenticationRequest.getPassword()));
+					authenticationRequest.getUsername(), authenticationRequest.getPassword()));
 		} catch (BadCredentialsException e) {
 			return null;
 		}
@@ -105,19 +105,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		} else {
 			role = Role.ROLE_USER;
 		}
-		
+
 		VerificationToken verificationToken = new VerificationToken();
 		verificationToken.setToken(jwt);
 		verificationToken.setUser(user);
 		verificationTokenService.saveToken(verificationToken);
-		System.out.println("TOKEEN");
-		System.out.println(verificationTokenService.findByToken(jwt).getToken());;
-//		System.out.println(userService.findUserByToken(jwt).getUsername());
-		
-		System.out.println("LOGIN EVENT SENT");
 		JwtAuthenticationRequestToSend authenticationRequestToSend = new JwtAuthenticationRequestToSend(authenticationRequest.getUsername(), authenticationRequest.getPassword(), jwt);
 		LoginEvent loginEvent = new LoginEvent(null, authenticationRequestToSend);
-		System.out.println("authentication request to send");
 		authenticationRequestToSend.getToken();
 		try {
 			userEventProducer.sendLoginEvent(loginEvent);
@@ -125,7 +119,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return new UserTokenState(jwt, expiresIn, role);
 	}
 
