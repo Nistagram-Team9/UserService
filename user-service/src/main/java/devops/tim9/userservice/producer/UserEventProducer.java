@@ -19,10 +19,10 @@ public class UserEventProducer {
 
 	@Autowired
 	KafkaTemplate<Integer, String> kafkaTemplate;
-	
+
 	@Autowired
 	ObjectMapper objectMapper;
-	
+
 	public void sendUserEvent(UserEvent userEvent) throws JsonProcessingException {
 		Integer key = userEvent.getUserEventId();
 		String value = objectMapper.writeValueAsString(userEvent);
@@ -30,26 +30,26 @@ public class UserEventProducer {
 		listenableFuture.addCallback(new ListenableFutureCallback<SendResult<Integer, String>>() {
 			@Override
 			public void onFailure(Throwable ex) {
-				
+
 			}
-			
+
 			@Override
 			public void onSuccess(SendResult<Integer, String> result) {
 				handleSuccess(key, value, result);
 			}
 		});
 	}
-	
+
 	private void handleSuccess(Integer key, String value, SendResult<Integer, String> result) {
 		System.out.println("Message Sent Successfully for the key: {} and the value is {} , partition is {}" +  key +  value + result.getRecordMetadata());
-		
+
 	}
-	
+
 	private void handleFailure(Integer key, String value, Throwable ex) {
 		System.out.println("Message Sent Successfully for the key: {} and the value is {} , partition is {}" + ex.getMessage());
-		
+
 	}
-	
+
 	public void sendLoginEvent(LoginEvent loginEvent) throws JsonProcessingException {
 		Integer key = loginEvent.getLoginEventId();
 		String value = objectMapper.writeValueAsString(loginEvent);
@@ -57,9 +57,9 @@ public class UserEventProducer {
 		listenableFuture.addCallback(new ListenableFutureCallback<SendResult<Integer, String>>() {
 			@Override
 			public void onFailure(Throwable ex) {
-				
+
 			}
-			
+
 			@Override
 			public void onSuccess(SendResult<Integer, String> result) {
 				handleSuccess(key, value, result);

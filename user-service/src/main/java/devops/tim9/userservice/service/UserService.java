@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,19 +25,23 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 
 @Service
 public class UserService implements UserDetailsService{
-	
+
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
-	
+
 	@Autowired
 	UserEventProducer userEventProducer;
-	
+
 	public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
 		this.userRepository = userRepository;
 		this.passwordEncoder = passwordEncoder;
 	}
-	
-	
+
+	public User getLoggedIn() {
+		User user = (User) userRepository
+				.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+		return user;
+	}
 
 	public User findById(Integer id) {
 		return userRepository.findById(id).orElse(null);
@@ -55,8 +60,8 @@ public class UserService implements UserDetailsService{
 		authorities.add(new Authority(Role.ROLE_USER));
 		user.setAuthorities(authorities);
 		this.create(user);
-		
-		
+
+
 		UserEvent userEvent2 = new UserEvent(null, user, "registerUser");
 		try {
 			userEventProducer.sendUserEvent(userEvent2);
@@ -64,11 +69,11 @@ public class UserService implements UserDetailsService{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
+
+
 		return user;
 	}
-	
+
 	public User registerAdmin(UserDto userDto) throws Exception {
 		if (this.usernameTaken(userDto.getUsername())) {
 			throw new IllegalArgumentException("Username is already taken.");
@@ -79,7 +84,7 @@ public class UserService implements UserDetailsService{
 		authorities.add(new Authority(Role.ROLE_ADMIN));
 		user.setAuthorities(authorities);
 		this.create(user);
-		
+
 		UserEvent userEvent2 = new UserEvent(null, user, "registerAdmin");
 		try {
 			userEventProducer.sendUserEvent(userEvent2);
@@ -89,9 +94,10 @@ public class UserService implements UserDetailsService{
 		}
 		return user;
 	}
-	
-	public User update(Integer id, UserDto userDto) {
-		User user = this.findById(id);
+
+	public User update(UserDto userDto) {
+		User user = (User) userRepository
+				.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
 		if (user != null) {
 			user.name = userDto.getName();
 			user.surname = userDto.getSurname();
@@ -105,7 +111,9 @@ public class UserService implements UserDetailsService{
 			user.isPrivate = userDto.getIsPrivate();
 			user.canBeTagged = userDto.getCanBeTagged();
 			user.isActive = userDto.getIsActive();
-			user.setPassword(this.passwordEncoder.encode(userDto.getPassword()));
+			if (userDto.getPassword() != "") {
+				user.setPassword(this.passwordEncoder.encode(userDto.getPassword()));
+			}
 
 			UserEvent userEvent2 = new UserEvent(null, user, "update");
 			try {
@@ -114,6 +122,7 @@ public class UserService implements UserDetailsService{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			this.userRepository.save(user);
 		}
 		return user;
 	}
@@ -144,7 +153,7 @@ public class UserService implements UserDetailsService{
 		}
 		return user.get();
 	}
-	
+
 	public User findUserByToken(String token) {
 		return userRepository.findByToken(token);
 	}

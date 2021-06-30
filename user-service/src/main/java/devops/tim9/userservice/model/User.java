@@ -29,11 +29,11 @@ import javax.persistence.JoinColumn;
 @Setter
 @NoArgsConstructor
 public class User implements UserDetails{
-	
+
 	@Id
 	@GeneratedValue
 	private Integer id;
-	
+
 	public String name;
 	public String surname;
 	public String email;
@@ -47,12 +47,12 @@ public class User implements UserDetails{
 	public Boolean canBeTagged;
 	public Boolean isActive;
 	public String password;
-	
+
 	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinTable(name = "user_authority", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "authority_id", referencedColumnName = "id"))
 	@JsonIgnore
 	private List<Authority> authorities = new ArrayList<>();
-	
+
 	public User(UserDto userDto) {
 		this.name = userDto.getName();
 		this.surname = userDto.getSurname();
@@ -66,10 +66,10 @@ public class User implements UserDetails{
 		this.isPrivate = userDto.getIsPrivate();
 		this.canBeTagged = userDto.getCanBeTagged();
 		this.isActive = userDto.getIsActive();
-		
+
 	}
-	
-	
+
+
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return this.authorities;

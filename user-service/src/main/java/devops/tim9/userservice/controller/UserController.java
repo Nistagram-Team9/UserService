@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,11 +24,14 @@ import org.springframework.web.multipart.MultipartFile;
 import devops.tim9.userservice.config.JwtAuthenticationRequest;
 import devops.tim9.userservice.config.UserTokenState;
 import devops.tim9.userservice.config.WebSecurityConfig;
+import devops.tim9.userservice.dto.MessageDto;
 import devops.tim9.userservice.dto.UserDto;
 import devops.tim9.userservice.model.User;
 import devops.tim9.userservice.service.UserService;
 
+
 @RestController
+@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
 public class UserController {
 
@@ -39,28 +43,30 @@ public class UserController {
 		this.webSecurityConfig = webSecurityConfig;
 	}
 
-	@PostMapping("/register-user")
-	public ResponseEntity<String> registerUser(@RequestBody UserDto userDto) {
+	@PostMapping(value = "/register-user")
+	public ResponseEntity<MessageDto> registerUser(@RequestBody UserDto userDto) {
 		try {
 			User user = userService.registerUser(userDto);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return new ResponseEntity<>("You have successfully registrated.", HttpStatus.CREATED);
+		return new ResponseEntity<>(new MessageDto("success", "You have successfully registrated."), HttpStatus.CREATED);
 	}
-	
+
+
+
 	@PostMapping("/register-admin")
-	public ResponseEntity<String> registerAdmin(@RequestBody UserDto userDto) {
+	public ResponseEntity<MessageDto> registerAdmin(@RequestBody UserDto userDto) {
 		try {
 			User user = userService.registerAdmin(userDto);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return new ResponseEntity<>("You have successfully registrated.", HttpStatus.CREATED);
+		return new ResponseEntity<>(new MessageDto("success", "You have successfully registrated."), HttpStatus.CREATED);
 	}
-	
+
 	@GetMapping(value = "/{id}")
 	public ResponseEntity<User> get(@PathVariable Integer id) {
 		User user = userService.findById(id);
@@ -70,23 +76,30 @@ public class UserController {
 			return ResponseEntity.badRequest().body(new User());
 		}
 	}
-	
+
+	@GetMapping(value = "get-logged")
+	public ResponseEntity<User> getLoggedIn() {
+		User user = userService.getLoggedIn();
+		return new ResponseEntity<>(user, HttpStatus.OK);
+
+	}
+
 	@GetMapping
 	public ResponseEntity<List<User>> getAll() {
 		List<User> users = userService.getAll();
 		return new ResponseEntity<>(users, HttpStatus.OK);
 	}
-	
-	@PutMapping(value = "/{id}")
-	public ResponseEntity<String> update(@PathVariable Integer id, @RequestBody UserDto userDto) {
-		User user = userService.update(id, userDto);
+
+	@PutMapping
+	public ResponseEntity<MessageDto> update(@RequestBody UserDto userDto) {
+		User user = userService.update(userDto);
 		if (user != null) {
-			return new ResponseEntity<>("User succesfully updated.", HttpStatus.OK);
+			return new ResponseEntity<>( new MessageDto("Success", "User succesfully updated."), HttpStatus.OK);
 		} else {
-			return ResponseEntity.badRequest().body("Error while updating user.");
+			return new ResponseEntity<>( new MessageDto("Error", "Error while updating user."), HttpStatus.OK);
 		}
 	}
-	
+
 	@DeleteMapping(value = "/{id}")
 	public ResponseEntity<String> delete(@PathVariable Integer id) {
 		User user = userService.delete(id);
@@ -96,10 +109,10 @@ public class UserController {
 			return ResponseEntity.badRequest().body("Error while deleting user.");
 		}
 	}
-	
+
 	@PostMapping(value = "/login")
 	public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtAuthenticationRequest authenticationRequest,
-		HttpServletResponse response) throws AuthenticationException, IOException, Exception {
+													   HttpServletResponse response) throws AuthenticationException, IOException, Exception {
 
 		UserTokenState userTokenState = webSecurityConfig.login(authenticationRequest);
 		if (userTokenState == null) {
@@ -108,6 +121,6 @@ public class UserController {
 			return new ResponseEntity<>(userTokenState, HttpStatus.OK);
 		}
 	}
-	
-	
+
+
 }
