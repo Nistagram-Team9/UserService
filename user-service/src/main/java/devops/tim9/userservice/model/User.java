@@ -28,7 +28,7 @@ import javax.persistence.JoinColumn;
 @Getter
 @Setter
 @NoArgsConstructor
-public class User implements UserDetails{
+public class User implements UserDetails {
 
 	@Id
 	@GeneratedValue
@@ -47,13 +47,15 @@ public class User implements UserDetails{
 	public Boolean canBeTagged;
 	public Boolean isActive;
 	public String password;
+	public Boolean isDisabled;
+	public Boolean isAccepted;
 
 	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinTable(name = "user_authority", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "authority_id", referencedColumnName = "id"))
 	@JsonIgnore
 	private List<Authority> authorities = new ArrayList<>();
 
-	public User(UserDto userDto) {
+	public User(UserDto userDto, Boolean isAccepted) {
 		this.name = userDto.getName();
 		this.surname = userDto.getSurname();
 		this.email = userDto.getEmail();
@@ -66,18 +68,20 @@ public class User implements UserDetails{
 		this.isPrivate = userDto.getIsPrivate();
 		this.canBeTagged = userDto.getCanBeTagged();
 		this.isActive = userDto.getIsActive();
+		this.isDisabled = false;
+		this.isAccepted = isAccepted;
 
 	}
-
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return this.authorities;
 	}
 
-	public List<Authority> getAuthoitiesList(){
-		return  authorities;
+	public List<Authority> getAuthoitiesList() {
+		return authorities;
 	}
+
 	@JsonIgnore
 	@Override
 	public boolean isAccountNonExpired() {
@@ -101,7 +105,6 @@ public class User implements UserDetails{
 	public boolean isEnabled() {
 		return true;
 	}
-
 
 	@Override
 	public String getPassword() {
