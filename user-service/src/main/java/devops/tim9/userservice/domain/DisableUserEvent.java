@@ -5,11 +5,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Book {
+@Getter
+@Setter
+public class DisableUserEvent {
+	private Integer disableUserEventId;
+	private String username;
 
-	public String name;
 }

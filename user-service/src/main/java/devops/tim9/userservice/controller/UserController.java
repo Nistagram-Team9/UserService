@@ -66,6 +66,18 @@ public class UserController {
 		}
 		return new ResponseEntity<>(new MessageDto("success", "You have successfully registrated."), HttpStatus.CREATED);
 	}
+	
+	@PostMapping(value = "/register-agent")
+	public ResponseEntity<MessageDto> registerAgent(@RequestBody UserDto userDto) {
+		try {
+			User user = userService.registerAgent(userDto);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return new ResponseEntity<>(new MessageDto("success", "You have successfully registrated."), HttpStatus.CREATED);
+	}
+
 
 	@GetMapping(value = "/{id}")
 	public ResponseEntity<User> get(@PathVariable Integer id) {
