@@ -102,6 +102,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		Role role = null;
 		if (user.getAuthoitiesList().get(0).getRole().equals(Role.ROLE_ADMIN)) {
 			role = Role.ROLE_ADMIN;
+		} 
+		else if (user.getAuthoitiesList().get(0).getRole().equals(Role.ROLE_AGENT)){
+			role = Role.ROLE_AGENT;
 		} else {
 			role = Role.ROLE_USER;
 		}
