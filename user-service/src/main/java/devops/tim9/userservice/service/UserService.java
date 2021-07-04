@@ -133,6 +133,8 @@ public class UserService implements UserDetailsService {
 	}
 
 	public User registerAgent(UserDto userDto) throws Exception {
+		System.out.println("Registrating agent");
+		System.out.println(userDto.getUsername());
 		if (this.usernameTaken(userDto.getUsername())) {
 			throw new IllegalArgumentException("Username is already taken.");
 		}

@@ -7,6 +7,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -16,6 +17,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
 	private TokenHelper tokenHelper;
 
+	@Autowired
 	private UserDetailsService userDetailsService;
 
 	public TokenAuthenticationFilter(TokenHelper tokenHelper, UserDetailsService userDetailsService) {
