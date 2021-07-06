@@ -51,6 +51,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	UserEventProducer userEventProducer;
+	
+	@Bean
+	@Override
+	public AuthenticationManager authenticationManagerBean() throws Exception {
+		return super.authenticationManagerBean();
+	}
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
@@ -102,6 +108,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		Role role = null;
 		if (user.getAuthoitiesList().get(0).getRole().equals(Role.ROLE_ADMIN)) {
 			role = Role.ROLE_ADMIN;
+		} 
+		else if (user.getAuthoitiesList().get(0).getRole().equals(Role.ROLE_AGENT)){
+			role = Role.ROLE_AGENT;
 		} else {
 			role = Role.ROLE_USER;
 		}
